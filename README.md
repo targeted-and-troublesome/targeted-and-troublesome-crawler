@@ -8,7 +8,7 @@ This repository contains the code for the paper titled [_Targeted and Troublesom
 We extended DuckDuckGo’s [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) to record HTTP requests/responses, cookies,
 screenshots, and JavaScript API calls. Our main modifications can be found in the following files:
 - [`AdCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/AdCollector.js): detects ads and scrapes ad
-disclosures.
+disclosures. During the development of AdCollector, we benefited from the [adscraper](https://github.com/UWCSESecurityLab/adscraper) tool.
 - [`FingerprintCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/FingerprintCollector.js): detects fingerprinting related function calls and property accesses.
 - [`fingerprintDetection.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/helpers/fingerprintDetection.js): instrumentation for fingerprinting detection.
 - [`LinkCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/LinkCollector.js): extracts inner page links.
@@ -28,6 +28,12 @@ The [`shell_scripts/ad-scraper folder`](https://github.com/asumansenol/targeted-
 All URLs, including both landing and inner pages, associated with the child-directed sites, are available within [`this folder`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/urls).
 
 Please check the upstream [Tracker Radar Collector repository](https://github.com/duckduckgo/tracker-radar-collector/) for other command line options.
+
+We found ads linking to malicious content, and improper ads of sex toys, dating services, and ads containing sexually suggestive images as follows. For further information, please refer to our paper for a comprehensive overview.
+<p align="center">
+    <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/48864422/281004761-45e7659b-fef0-49aa-adf1-d776cb7dca62.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231107%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231107T102230Z&X-Amz-Expires=300&X-Amz-Signature=962089726876944688519766e179ad1b9e4a0f44592b113f9104d14117d06d3c&X-Amz-SignedHeaders=host&actor_id=48864422&key_id=0&repo_id=715520577" alt="Material Bread logo">
+</p>
+
 
 ### Reference
 ```
