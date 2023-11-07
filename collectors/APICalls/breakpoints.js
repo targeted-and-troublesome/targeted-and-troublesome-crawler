@@ -230,15 +230,13 @@ const breakpoints = [
             // toDataURL is an obvious way of getting the fingerprint, but there are other ways (e.g. reading pixel data or creating a blob), that's why we track all canvas usage
             {
                 name: 'constructor',
-                test: 'document.createElement("canvas")'
+                test: 'document.createElement("canvas")',
+                saveArguments: true
             },
             {
                 name: 'toDataURL',
-                test: 'var c = document.createElement("canvas"); c.toDataURL()'
-            },
-            {
-                name: 'toBlob',
-                test: 'var c = document.createElement("canvas"); c.toBlob()'
+                test: 'var c = document.createElement("canvas"); c.toDataURL()',
+                saveArguments: true
             }
         ]
     },
@@ -250,16 +248,19 @@ const breakpoints = [
             // used to detect fonts
             {
                 name: 'measureText',
-                test: 'var c = document.createElement("canvas"); var ctx = c.getContext("2d"); ctx.measureText("txt");'
+                test: 'var c = document.createElement("canvas"); var ctx = c.getContext("2d"); ctx.measureText("txt");',
+                saveArguments: true
             },
             {
                 name: 'getImageData',
-                test: 'var c = document.createElement("canvas"); var ctx = c.getContext("2d"); ctx.getImageData();'
+                test: 'var c = document.createElement("canvas"); var ctx = c.getContext("2d"); ctx.getImageData();',
+                saveArguments: true
             },
-            // used to detect canvas winding
+            //used to detect canvas winding
             {
                 name: 'isPointInPath',
-                test: 'var c = document.createElement("canvas"); var ctx = c.getContext("2d"); ctx.rect(10, 10, 100, 100); ctx.fill(); ctx.isPointInPath(30, 70);'
+                test: 'var c = document.createElement("canvas"); var ctx = c.getContext("2d"); ctx.rect(10, 10, 100, 100); ctx.fill(); ctx.isPointInPath(30, 70);',
+                saveArguments: true
             }
         ]
     },
@@ -334,67 +335,6 @@ const breakpoints = [
                 name: 'getContextAttributes',
                 test: 'var c = document.createElement("canvas"); c.getContext("webgl").getContextAttributes()'
             },
-            {
-                name: 'readPixels',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl").readPixels(0, 0, 1, 1, WebGLRenderingContext.RGBA, WebGLRenderingContext.UNSIGNED_BYTE, new Uint8Array(4))'
-            }
-        ]
-    },
-    {
-        proto: 'WebGL2RenderingContext',
-        props: [
-            // {name: 'ALIASED_LINE_WIDTH_RANGE'}// we can't track static values
-            // 'WebGLRenderingContext.ALIASED_LINE_WIDTH_RANGE',
-            // 'WebGLRenderingContext.ALPHA_BITS',
-            // 'WebGLRenderingContext.BLUE_BITS',
-            // 'WebGLRenderingContext.DEPTH_BITS',
-            // 'WebGLRenderingContext.GREEN_BITS',
-            // 'WebGLRenderingContext.RED_BITS',
-            // 'WebGLRenderingContext.MAX_COMBINED_TEXTURE_IMAGE_UNITS',
-            // 'WebGLRenderingContext.MAX_CUBE_MAP_TEXTURE_SIZE',
-            // 'WebGLRenderingContext.MAX_FRAGMENT_UNIFORM_VECTORS',
-            // 'WebGLRenderingContext.MAX_RENDERBUFFER_SIZE',
-            // 'WebGLRenderingContext.MAX_TEXTURE_IMAGE_UNITS',
-            // 'WebGLRenderingContext.MAX_TEXTURE_SIZE',
-            // 'WebGLRenderingContext.MAX_VARYING_VECTORS',
-            // 'WebGLRenderingContext.MAX_VERTEX_ATTRIBS',
-            // 'WebGLRenderingContext.MAX_VERTEX_TEXTURE_IMAGE_UNITS',
-            // 'WebGLRenderingContext.MAX_VERTEX_UNIFORM_VECTORS',
-            // 'WebGLRenderingContext.MAX_VIEWPORT_DIMS',
-            // 'WebGLRenderingContext.RENDERER',
-            // 'WebGLRenderingContext.SHADING_LANGUAGE_VERSION',
-            // 'WebGLRenderingContext.VENDOR',
-            // 'WebGLRenderingContext.VERSION',
-            // 'WebGLRenderingContext.VERTEX_SHADER',
-            // 'WebGLRenderingContext.FRAGMENT_SHADER',
-            // 'WebGLRenderingContext.COLOR_BUFFER_BIT',
-            // 'WebGLRenderingContext.DEPTH_BUFFER_BIT'
-        ],
-        methods: [
-            {
-                name: 'getSupportedExtensions',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl2").getSupportedExtensions()'
-            },
-            {
-                name: 'getExtension',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl2").getExtension("")'
-            },
-            {
-                name: 'getParameter',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl2").getParameter("")'
-            },
-            {
-                name: 'getShaderPrecisionFormat',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl2").getShaderPrecisionFormat(WebGLRenderingContext.FRAGMENT_SHADER, WebGLRenderingContext.LOW_FLOAT)'
-            },
-            {
-                name: 'getContextAttributes',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl2").getContextAttributes()'
-            },
-            {
-                name: 'readPixels',
-                test: 'var c = document.createElement("canvas"); c.getContext("webgl2").readPixels(0, 0, 1, 1, WebGLRenderingContext.RGBA, WebGLRenderingContext.UNSIGNED_BYTE, new Uint8Array(4))'
-            }
         ]
     },
     {
@@ -679,7 +619,6 @@ module.exports = breakpoints;
  * @property {string=} description - human redable description of a breakpoint
  * @property {string=} condition - additional condition that has to be truthy for the breakpoint to fire
  * @property {boolean=} saveArguments - save arguments of each call (defaults to false)
- * @property {string=} cdpId - optional breakpointID from CDP
  */
 
  /**
@@ -690,9 +629,4 @@ module.exports = breakpoints;
  * @property {string=} condition - additional condition that has to be truthy for the breakpoint to fire
  * @property {boolean=} saveArguments - save arguments of each call (defaults to false)
  * @property {boolean=} setter - hook up to a property setter instead of getter (which is a default)
- * @property {string=} cdpId - optional breakpointID from CDP
  */
-
- /**
-  * @typedef {MethodBreakpoint | PropertyBreakpoint} Breakpoint
-  */

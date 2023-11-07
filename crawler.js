@@ -4,13 +4,20 @@ const chalk = require('chalk').default;
 const {createTimer} = require('./helpers/timer');
 const wait = require('./helpers/wait');
 const tldts = require('tldts');
+const fs = require('fs');
+// const fingerprintDetection = require('./helpers/fingerprintDetection');
+// TODO: try converting back to module.exports
+const fpSrc = fs.readFileSync('./helpers/fingerprintDetection.js', 'utf8');
 
-const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36';
-const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 10; Pixel 2 XL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Mobile Safari/537.36';
+const ENABLE_CHALK = false;
+chalk.enabled = ENABLE_CHALK;
+
+const DEFAULT_USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36';
+const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 10; Pixel 2 XL) AppleWebKit/537.36 (KHTML, like Gecko)  Chrome/112.0.0.0 Mobile Safari/537.36';
 
 const DEFAULT_VIEWPORT = {
-    width: 1440,//px
-    height: 812//px
+    width: 1920,  // px
+    height: 1080  // px
 };
 const MOBILE_VIEWPORT = {
     width: 412,
@@ -20,7 +27,7 @@ const MOBILE_VIEWPORT = {
     hasTouch: true
 };
 
-// for debugging: will lunch in window mode instad of headless, open devtools and don't close windows after process finishes
+// for debugging: will launch in window mode instad of headless, open devtools and don't close windows after process finishes
 const VISUAL_DEBUG = false;
 
 /**
@@ -35,14 +42,16 @@ function openBrowser(log, proxyHost, executablePath) {
     const args = {
         args: [
             // enable FLoC
+            '--no-sandbox',
+            '--disable-web-security',
+            '--disable-features=IsolateOrigins,site-per-process',
             '--enable-blink-features=InterestCohortAPI',
-            '--enable-features="FederatedLearningOfCohorts:update_interval/10s/minimum_history_domain_size_required/1,FlocIdSortingLshBasedComputation,InterestCohortFeaturePolicy"',
-            '--js-flags="--async-stack-traces --stack-trace-limit 32"'
+            '--enable-features="FederatedLearningOfCohorts:update_interval/10s/minimum_history_domain_size_required/1,FlocIdSortingLshBasedComputation,InterestCohortFeaturePolicy"'
         ]
     };
     if (VISUAL_DEBUG) {
         args.headless = false;
-        args.devtools = true;
+        args.devtools = false;
     }
     if (proxyHost) {
         let url;
@@ -66,8 +75,7 @@ function openBrowser(log, proxyHost, executablePath) {
 /**
  * @param {puppeteer.BrowserContext} context
  * @param {URL} url
- * @param {{collectors: import('./collectors/BaseCollector')[], log: function(...any):void, urlFilter: function(string, string):boolean, emulateMobile: boolean, emulateUserAgent: boolean, runInEveryFrame: function():void, maxLoadTimeMs: number, extraExecutionTimeMs: number, collectorFlags: Object.<string, string>}} data
- *
+ * @param {{collectors: import('./collectors/BaseCollector')[];log: function(...any):void;urlFilter: function(string, string):boolean;emulateMobile: boolean;emulateUserAgent: boolean;runInEveryFrame: function():void;maxLoadTimeMs: number;extraExecutionTimeMs: number;collectorFlags: Object<string, string>;outputPath: string;urlHash: string;}} data
  * @returns {Promise<CollectResult>}
  */
 async function getSiteData(context, url, {
@@ -80,6 +88,8 @@ async function getSiteData(context, url, {
     maxLoadTimeMs,
     extraExecutionTimeMs,
     collectorFlags,
+    outputPath,
+    urlHash
 }) {
     const testStarted = Date.now();
 
@@ -92,7 +102,10 @@ async function getSiteData(context, url, {
         context,
         url,
         log,
-        collectorFlags
+        collectorFlags,
+        outputPath,
+        urlHash,
+        emulateMobile
     };
 
     for (let collector of collectors) {
@@ -101,7 +114,7 @@ async function getSiteData(context, url, {
         try {
             // eslint-disable-next-line no-await-in-loop
             await collector.init(collectorOptions);
-            log(`${collector.id()} init took ${timer.getElapsedTime()}s`);
+            // log(`${collector.id()} init took ${timer.getElapsedTime()}s`);
         } catch (e) {
             log(chalk.yellow(`${collector.id()} init failed`), chalk.gray(e.message), chalk.gray(e.stack));
         }
@@ -111,6 +124,17 @@ async function getSiteData(context, url, {
 
     // initiate collectors for all contexts (main page, web worker, service worker etc.)
     context.on('targetcreated', async target => {
+        if (target.type() === 'page' && pageTargetCreated) {
+            let newPage = await target.page();
+            let adCollector = collectors.find(collector => collector.id() === 'ads');
+            try {
+                // eslint-disable-next-line no-await-in-loop
+                await adCollector.addListener(newPage, url, outputPath, urlHash, context);
+            } catch (e) {
+                log(chalk.yellow(`${adCollector.id()} failed to attach to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
+            }
+            return;
+        }
         // we have already initiated collectors for the main page, so we ignore the first page target
         if (target.type() === 'page' && !pageTargetCreated) {
             pageTargetCreated = true;
@@ -119,9 +143,10 @@ async function getSiteData(context, url, {
 
         const timer = createTimer();
         let cdpClient = null;
-        
+
         try {
             cdpClient = await target.createCDPSession();
+            log(`${target.type()} target created in ${timer.getElapsedTime()}s`);
         } catch (e) {
             log(chalk.yellow(`Failed to connect to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
             return;
@@ -140,8 +165,13 @@ async function getSiteData(context, url, {
 
         for (let collector of collectors) {
             try {
+                if(target.type() === 'page' && pageTargetCreated) {
+                    log(`Skipping ${collector.id()} for ${target.type()} target since it's ad page.`);
+                    continue;
+                }
                 // eslint-disable-next-line no-await-in-loop
                 await collector.addTarget(simpleTarget);
+                // log(`${collector.id()} attached to "${target.url()}" in ${timer.getElapsedTime()}s`);
             } catch (e) {
                 log(chalk.yellow(`${collector.id()} failed to attach to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
             }
@@ -165,6 +195,18 @@ async function getSiteData(context, url, {
     // optional function that should be run on every page (and subframe) in the browser context
     if (runInEveryFrame) {
         page.evaluateOnNewDocument(runInEveryFrame);
+        // page.evaluateOnNewDocument(fingerprintDetection);
+        page.evaluateOnNewDocument(fpSrc);
+    }
+    for (let collector of collectors) {
+        if(collector.id() === 'fingerprints') {
+            try {
+                // eslint-disable-next-line no-await-in-loop
+                await collector.addListener(page);
+            } catch (e) {
+                log(chalk.yellow(`${collector.id()} failed to attach to page`), chalk.gray(e.message), chalk.gray(e.stack));
+            }
+        }
     }
 
     // We are creating CDP connection before page target is created, if we create it only after
@@ -178,7 +220,7 @@ async function getSiteData(context, url, {
     for (let collector of collectors) {
         try {
             // eslint-disable-next-line no-await-in-loop
-            await collector.addTarget({url: url.toString(), type: 'page', cdpClient});
+            await collector.addTarget({url: url.toString(), type: 'page', cdpClient, page, outputPath, urlHash});
         } catch (e) {
             log(chalk.yellow(`${collector.id()} failed to attach to page`), chalk.gray(e.message), chalk.gray(e.stack));
         }
@@ -198,9 +240,11 @@ async function getSiteData(context, url, {
     page.on('error', e => log(chalk.red(e.message)));
 
     let timeout = false;
-
     try {
+        // log the page load time
+        const loadTimer = createTimer();
         await page.goto(url.toString(), {timeout: maxLoadTimeMs, waitUntil: 'networkidle0'});
+        log(`⏱️ Page load took ${loadTimer.getElapsedTime()}s`);
     } catch (e) {
         if (e instanceof puppeteer.errors.TimeoutError || (e.name && e.name === 'TimeoutError')) {
             log(chalk.yellow('Navigation timeout exceeded.'));
@@ -222,7 +266,10 @@ async function getSiteData(context, url, {
         try {
             // eslint-disable-next-line no-await-in-loop
             await collector.postLoad();
-            log(`${collector.id()} postLoad took ${postLoadTimer.getElapsedTime()}s`);
+            const elapsed = postLoadTimer.getElapsedTime();
+            if (! elapsed.startsWith('0.')) {
+                log(`⏱️ ${collector.id()} postLoad took ${elapsed}s`);
+            }
         } catch (e) {
             log(chalk.yellow(`${collector.id()} postLoad failed`), chalk.gray(e.message), chalk.gray(e.stack));
         }
@@ -230,8 +277,8 @@ async function getSiteData(context, url, {
 
     // give website a bit more time for things to settle
     await page.waitForTimeout(extraExecutionTimeMs);
-
     const finalUrl = page.url();
+
     /**
      * @type {Object<string, Object>}
      */
@@ -243,10 +290,18 @@ async function getSiteData(context, url, {
             // eslint-disable-next-line no-await-in-loop
             const collectorData = await collector.getData({
                 finalUrl,
-                urlFilter: urlFilter && urlFilter.bind(null, finalUrl)
+                urlFilter: urlFilter && urlFilter.bind(null, finalUrl),
+                page,
+                outputPath,
+                urlHash,
+                context
             });
             data[collector.id()] = collectorData;
-            log(`getting ${collector.id()} data took ${getDataTimer.getElapsedTime()}s`);
+            const elapsed = getDataTimer.getElapsedTime();
+            if (! elapsed.startsWith('0.')) {
+                log(`⏱️ ${collector.id()} data took ${elapsed}s`);
+            }
+            // log(`getting ${collector.id()} data took ${}s`);
         } catch (e) {
             log(chalk.yellow(`getting ${collector.id()} data failed`), chalk.gray(e.message), chalk.gray(e.stack));
             data[collector.id()] = null;
@@ -289,7 +344,7 @@ function isThirdPartyRequest(documentUrl, requestUrl) {
 
 /**
  * @param {URL} url
- * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, collectorFlags?: Object.<string, string>}} options
+ * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, collectorFlags?: Object.<string, string>, outputPath: string, urlHash: string}} options
  * @returns {Promise<CollectResult>}
  */
 module.exports = async (url, options) => {
@@ -302,7 +357,7 @@ module.exports = async (url, options) => {
 
     const maxLoadTimeMs = options.maxLoadTimeMs || 30000;
     const extraExecutionTimeMs = options.extraExecutionTimeMs || 2500;
-    const maxTotalTimeMs = maxLoadTimeMs * 2;
+    const maxTotalTimeMs = maxLoadTimeMs * 8;
 
     try {
         data = await wait(getSiteData(context, url, {
@@ -314,15 +369,21 @@ module.exports = async (url, options) => {
             runInEveryFrame: options.runInEveryFrame,
             maxLoadTimeMs,
             extraExecutionTimeMs,
-            collectorFlags: options.collectorFlags
+            collectorFlags: options.collectorFlags,
+            outputPath: options.outputPath,
+            urlHash: options.urlHash
         }), maxTotalTimeMs);
     } catch(e) {
-        log(chalk.red('Crawl failed'), e.message, chalk.gray(e.stack));
+        log(chalk.red('******************* ERROR: Crawl failed *******************'), e.message, chalk.gray(e.stack));
         throw e;
     } finally {
         // only close the browser if it was created here and not debugging
         if (browser && !VISUAL_DEBUG) {
+            log('Closing the context and the browser');
+            await context.close();
+            log('Context closed');
             await browser.close();
+            log('Browser process closed');
         }
     }
 

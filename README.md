@@ -1,132 +1,41 @@
-# DuckDuckGo Tracker Radar Collector
-🕸 Modular, multithreaded, [puppeteer](https://github.com/GoogleChrome/puppeteer)-based crawler used to generate third party request data for the [Tracker Radar](https://github.com/duckduckgo/tracker-radar).
+## Targeted and Troublesome: Tracking and Advertising on Children's Websites (S&P'24)
 
-## How do I use it?
+This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/abs/2308.04887) (to be presented at [IEEE S&P'24](https://sp2024.ieee-security.org/)).
 
-### Use it from the command line
+**Background:** Trackers and advertisers frequently exploit users' online behavior without consent, including on websites targeting children. However, research in this area remains limited. To address this gap, we conduct an examination of tracking and advertising practices on such websites. Leveraging a multilingual classifier we developed and a dataset comprising over two million web pages, we identify two thousand child-directed websites and assess the prevalence of trackers, fingerprinting scripts, and advertisements. Our findings indicate that roughly 90% of these websites employ tracking mechanisms, and about 27% display targeted advertisements, underscoring the need for parental consent. Additionally, we employ a machine learning pipeline to uncover inappropriate ads promoting dating, weight loss, mental health services, and explicit content, highlighting the necessity for more stringent regulatory measures to protect children online.
 
-1. Clone this project locally (`git clone git@github.com:duckduckgo/tracker-radar-collector.git`)
-2. Install all dependencies (`npm i`)
-3. Run the command line tool:
+### Crawler
+We extended DuckDuckGo’s [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) to record HTTP requests/responses, cookies,
+screenshots, and JavaScript API calls. Our main modifications can be found in the following files:
+- [`AdCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/AdCollector.js): detects ads and scrapes ad
+disclosures.
+- [`FingerprintCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/FingerprintCollector.js): detects fingerprinting related function calls and property accesses.
+- [`fingerprintDetection.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/helpers/fingerprintDetection.js): instrumentation for fingerprinting detection.
+- [`LinkCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/LinkCollector.js): extracts inner page links.
+- [`VideoCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/VideoCollector.js): captures the crawl video.
 
-```sh
-npm run crawl -- -u "https://example.com" -o ./data/ -v
+To start a crawl, 1) clone this repo, 2) install the required npm packages (`npm i`) and 3) run the following command for a given URL or a URL list:
+
+- for a given URL: 
+
+```npm run crawl -- -u 'https://games2jolly.com/' -o ./data/ -v -f -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"```
+
+- for a URL list: 
+
+```npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv -o ./data/ -v -f -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"```
+
+The [`shell_scripts/ad-scraper folder`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/shell_scripts/ad-scraper) contains the commands used to crawl the child-directed sites as part of this study.
+All URLs, including both landing and inner pages, associated with the child-directed sites, are available within [`this folder`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/urls).
+
+Please check the upstream [Tracker Radar Collector repository](https://github.com/duckduckgo/tracker-radar-collector/) for other command line options.
+
+### Reference
 ```
-
-Available options:
-
-- `-o, --output <path>` - (required) output folder where output files will be created
-- `-u, --url <url>` - single URL to crawl
-- `-i, --input-list <path>` - path to a text file with list of URLs to crawl (each in a separate line)
-- `-d, --data-collectors <list>` - comma separated list (e.g `-d 'requests,cookies'`) of data collectors that should be used (all by default)
-- `-c, --crawlers <number>` - override the default number of concurrent crawlers (default number is picked based on the number of CPU cores)
-- `--reporters <list>` - comma separated list (e.g. `--reporters 'cli,file,html'`) of reporters to be used ('cli' by default)
-- `-v, --verbose` - instructs reporters to log additional information (e.g. for "cli" reporter progress bar will not be shown when verbose logging is enabled)
-- `-l, --log-path <path>` - instructs reporters where all logs should be written to
-- `-f, --force-overwrite` - overwrite existing output files (by default entries with existing output files are skipped)
-- `-3, --only-3p` - don't save any first-party data (e.g. requests, API calls for the same eTLD+1 as the main document)
-- `-m, --mobile` - emulate a mobile device when crawling
-- `-p, --proxy-config <host>` - optional SOCKS proxy host
-- `-r, --region-code <region>` - optional 2 letter region code. For metadata only
-- `-a, --disable-anti-bot` - disable simple build-in anti bot detection script injected to every frame
-- `--chromium-version <version_number>` - use custom version of Chromium (e.g. "843427") instead of using the default
-- `--config <path>` - path to a config file that allows to set all the above settings (and more). Note that CLI flags have a higher priority than settings passed via config. You can find a sample config file in `tests/cli/sampleConfig.json`.
-- `--autoconsent-action <action>` - automatic autoconsent action (requires the `cmps` collector). Possible values: optIn, optOut
-
-### Use it as a module
-
-1. Install this project as a dependency (`npm i git+https://github.com:duckduckgo/tracker-radar-collector.git`).
-
-2. Import it:
-
-```js
-// you can either import a "crawlerConductor" that runs multiple crawlers for you
-const {crawlerConductor} = require('tracker-radar-collector');
-// or a single crawler
-const {crawler} = require('tracker-radar-collector');
-
-// you will also need some data collectors (/collectors/ folder contains all build-in collectors)
-const {RequestCollector, CookieCollector, …} = require('tracker-radar-collector');
+@article{
+    author    = {Z. Moti, A. Senol, H. Bostani, F. Borgesius, V. Moonsamy, A. Mathur, and G. Acar},
+    title     = {{Targeted and Troublesome: Tracking and Advertising on Children's Websites}},
+    booktitle = {IEEE Security and Privacy},
+    year      = 2024,
+    month     = May
+}
 ```
-
-3. Use it:
-
-```js
-crawlerConductor({
-    // required ↓
-    urls: ['https://example.com', {url: 'https://duck.com', dataCollectors: [new ScreenshotCollector()]}, …], // two formats available: first format will use default collectors set below, second format will use custom set of collectors for this one url
-    dataCallback: (url, result) => {…},
-    // optional ↓
-    dataCollectors: [new RequestCollector(), new CookieCollector()],
-    failureCallback: (url, error) => {…},
-    numberOfCrawlers: 12,// custom number of crawlers (there is a hard limit of 38 though)
-    logFunction: (...msg) => {…},// custom logging function
-    filterOutFirstParty: true,// don't save any first-party data (false by default)
-    emulateMobile: true,// emulate a mobile device (false by default)
-    proxyHost: 'socks5://myproxy:8080',// SOCKS proxy host (none by default)
-    antiBotDetection: true,// if anti bot detection script should be injected (true by default)
-    chromiumVersion: '843427',// Chromium version that should be downloaded and used instead of the default one
-    maxLoadTimeMs: 30000,// how long should crawlers wait for the page to load, defaults to 30s
-    extraExecutionTimeMs: 2500,// how long should crawlers wait after page loads before collecting data, defaults to 2.5s
-});
-```
-
-**OR** (if you prefer to run a single crawler)
-
-```js
-// crawler will throw an exception if crawl fails
-const data = await crawler(new URL('https://example.com'), {
-    // optional ↓
-    collectors: [new RequestCollector(), new CookieCollector(), …],
-    log: (...msg) => {…},
-    urlFilter: (url) => {…},// function that, for each request URL, decides if its data should be stored or not
-    emulateMobile: false,
-    emulateUserAgent: false,// don't use the default puppeteer UA (default true)
-    proxyHost: 'socks5://myproxy:8080',
-    browserContext: context,// if you prefer to create the browser context yourself (to e.g. use other browser or non-incognito context) you can pass it here (by default crawler will create an incognito context using standard chromium for you)
-    runInEveryFrame: () => {window.alert('injected')},// function that should be executed in every frame (main + all subframes)
-    executablePath: '/some/path/Chromium.app/Contents/MacOS/Chromium',// path to a custom Chromium installation that should be used instead of the default one
-    maxLoadTimeMs: 30000,// how long should the crawler wait for the page to load, defaults to 30s
-    extraExecutionTimeMs: 2500,// how long should crawler wait after page loads before collecting data, defaults to 2.5s
-});
-```
-
-ℹ️ Hint: check out `crawl-cli.js` and `crawlerConductor.js` to see how `crawlerConductor` and `crawler` are used in the wild.
-
-## Output format
-
-Each successfully crawled website will create a separate file named after the website (when using the CLI tool). Output data format is specified in `crawler.js` (see `CollectResult` type definition).
-Additionally, for each crawl `metadata.json` file will be created containing crawl configuration, system configuration and some high-level stats. 
-
-## Data post-processing
-
-Example post-processing script, that can be used as a template, can be found in `post-processing/summary.js`. Execute it from the command line like this:
-
-```sh
-node ./post-processing/summary.js -i ./collected-data/ -o ./result.json
-```
-
-ℹ️ Hint: When dealing with huge amounts of data you may need to increase nodejs's memory limit e.g. `node --max_old_space_size=4096`.
-
-## Creating new collectors
-
-Each collector needs to extend the `BaseCollector` and has to override following methods:
-
-- `id()` which returns name of the collector (e.g. 'cookies')
-- `getData(options)` which should return collected data. `options` have following properties:
-    - `finalUrl` - final URL of the main document (after all redirects) that you may want to use,
-    - `filterFunction` which, if provided, takes an URL and returns a boolean telling you if given piece of data should be returned or filtered out based on its origin.
-
-Additionally, each collector can override following methods:
-
-- `init(options)` which is called before the crawl begins
-- `addTarget(targetInfo)` which is called whenever new target is created (main page, iframe, web worker etc.)
-- `postLoad()` which is called after the page has loaded. This is the place for executing heavy page interactions (`extraExecutionTimeMs` is applied after this hook).
-
-There are couple of built-in collectors in the `collectors/` folder. `CookieCollector` is the simplest one and can be used as a template.
-
-Each new collector has to be added in two places to be discoverable:
-- `crawlerConductor.js` - so that `crawlerConductor` knows about it (and it can be used in the CLI tool)
-- `main.js` - so that the new collector can be imported by other projects
-
-You can also add types to define the structure of the data exported by your collector. These should be added to the `CollectorData` type in `collectorsList.js`. This will add type hints to all places where the data is used in the code.

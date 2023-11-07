@@ -9,7 +9,7 @@ module.exports = {
     ],
     "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 2020
+        "ecmaVersion": 2018
     },
     "rules": {
         "accessor-pairs": "error",
@@ -159,7 +159,7 @@ module.exports = {
         "no-invalid-this": "error",
         "no-iterator": "error",
         "no-label-var": "error",
-        "no-labels": "off",
+        "no-labels": "error",
         "no-lone-blocks": "error",
         "no-lonely-if": "error",
         "no-loop-func": "off",

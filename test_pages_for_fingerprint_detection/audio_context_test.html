@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+    AUDIO CONTEXT TEST
+</body>
+
+const interceptFunctionCall = function (elementType, funcName) {
+    // save the original function using a closure
+    const origFunc = elementType.prototype[funcName];
+    // overwrite the object property
+    Object.defineProperty(elementType.prototype, funcName, {
+      value: function () {
+        // execute the original function
+        const retVal = origFunc.apply(this, arguments);
+        const stack = new Error().stack.split("\n");
+        stack.shift();
+        const lineTest = /(\()?(http[^)]+):[0-9]+:[0-9]+(\))?/;
+        res = stack[1].match(lineTest);
+        const scriptUrl = res && res[2];
+        // initialize call details with return value and arguments
+        callDetails = {
+          elementType: elementType.name,
+          funcName,
+          args: arguments,
+          retVal,
+          scriptUrl
+        };
+        // send the call details to the node context
+        // window.calledAPIEvent(callDetails);
+        console.log(callDetails);
+        return retVal;
+      },
+    });
+  };
+  const interceptPropAccess = function (elementType, propertyName) {
+    // save the original function using a closure
+    let realHTMLInputElement = Object.getOwnPropertyDescriptor(
+      CanvasRenderingContext2D.prototype,
+      "fillStyle"
+    );
+    // overwrite the object property
+    Object.defineProperty(elementType.prototype, propertyName, {
+      enumerable: true,
+      configurable: true,
+      get: realHTMLInputElement.get,
+      set: function (value) {
+        const stack = new Error().stack.split("\n");
+        stack.shift();
+        const lineTest = /(\()?(http[^)]+):[0-9]+:[0-9]+(\))?/;
+        res = stack[1].match(lineTest);
+        const scriptUrl = res && res[2];
+        // initialize call details with return value and arguments
+        callDetails = {
+          elementType: elementType.name,
+          funcName: propertyName,
+          args: arguments,
+          retVal: '',
+          scriptUrl,
+        };
+        // send the call details to the node context
+        // window.calledAPIEvent(callDetails);
+        console.log(callDetails);
+        return value;
+      },
+    });
+  };
+
+interceptFunctionCall(OfflineAudioContext, "createOscillator");
+interceptFunctionCall(OfflineAudioContext, "createDynamicsCompressor");
+interceptPropAccess(OfflineAudioContext, "destination");
+interceptFunctionCall(OfflineAudioContext, "startRendering");
+interceptPropAccess(OfflineAudioContext, "oncomplete");
+</script> -->
+<script src="audio_context_test.js"></script>
+</html>

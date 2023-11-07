@@ -174,6 +174,7 @@ async function run(inputUrls, outputPath, verbose, logPath, numberOfCrawlers, da
             maxLoadTimeMs,
             extraExecutionTimeMs,
             collectorFlags,
+            outputPath,
         });
         log(chalk.green('\n✅ Finished successfully.'));
     } catch(e) {

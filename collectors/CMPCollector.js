@@ -3,6 +3,7 @@ const fs = require('fs');
 const createDeferred = require('../helpers/deferred');
 const waitFor = require('../helpers/waitFor');
 const BaseCollector = require('./BaseCollector');
+const pageUtils = require('../helpers/utils');
 
 /**
  * @typedef { import('./BaseCollector').CollectorInitOptions } CollectorInitOptions
@@ -31,6 +32,8 @@ window.autoconsentSendMessage = (msg) => {
 ` + baseContentScript;
 
 const worldName = 'cmpcollector';
+
+const WAIT_TIME_BEFORE_POST_CMP_ACTION_SCREENSHOT = 1000;
 
 /**
  * @param {String|Error} e
@@ -82,6 +85,8 @@ class CMPCollector extends BaseCollector {
      */
     init(options) {
         this.log = options.log;
+        this._urlHash = options.urlHash;
+        this._outputPath = options.outputPath;
         this.shortTimeouts = options.collectorFlags.shortTimeouts; // used to speed up unit tests
         this.autoAction = /** @type {AutoAction} */ (options.collectorFlags.autoconsentAction);
         /** @type {ContentScriptMessage[]} */
@@ -192,7 +197,6 @@ class CMPCollector extends BaseCollector {
                 autoAction: null, // we request action explicitly later
                 disabledCmps: [],
                 enablePrehide: false,
-                enableCosmeticRules: true,
                 detectRetries: 20,
             };
             await this._cdpClient.send('Runtime.evaluate', {
@@ -203,11 +207,34 @@ class CMPCollector extends BaseCollector {
         }
         case 'popupFound':
             if (this.autoAction) {
+                /**
+                 * @type {import("puppeteer").Page}
+                 */
+                let page;
+                const pages = await this.context.pages();
+                if (pages.length > 0) {
+                    page = pages[0];
+                    pageUtils.takeScreenshot(
+                        page, this._outputPath, this._urlHash, 'before_autoconsent_action',
+                        '_cmp0', this.log, false
+                    );
+                }
+                // page, outputPath, urlHash, ssSuffix, ssCounter, log
                 await this.pendingScan.promise; // wait for the pattern detection first
                 await this._cdpClient.send('Runtime.evaluate', {
                     expression: `autoconsentReceiveMessage({ type: "${this.autoAction}" })`,
                     contextId: executionContextId,
                 });
+                if (page) {
+                    // use setTimeout to delay the screenshot a bit, since some
+                    // dialogs use fade-out animations
+                    setTimeout(() => {
+                        pageUtils.takeScreenshot(
+                            page, this._outputPath, this._urlHash, 'after_autoconsent_action',
+                            '_cmp1', this.log, false
+                        );
+                    }, WAIT_TIME_BEFORE_POST_CMP_ACTION_SCREENSHOT);
+                }
             }
             break;
         case 'optInResult':
@@ -329,23 +356,47 @@ class CMPCollector extends BaseCollector {
             const promises = [];
             page.frames().forEach(frame => {
                 // eslint-disable-next-line no-undef
-                promises.push(frame.evaluate(() => document.documentElement.innerText).catch(reason => {
-                    this.log(`error retrieving text: ${reason}`);
+                promises.push(frame.evaluate(() => document?.documentElement?.innerText).catch(reason => {
+                    this.log(`CMP Collector: Error retrieving frame innerText: ${reason}`);
                     // ignore exceptions
                     return '';
                 }));
             });
-            const texts = await Promise.all(promises);
-            const allTexts = texts.join('\n');
-            for (const p of DETECT_PATTERNS) {
-                const matches = allTexts.match(p);
-                if (matches) {
-                    foundPatterns.push(p.toString());
-                    foundSnippets.push(...matches.map(m => m.substring(0, 200)));
+            // waiting for all promises hang on some sites
+            // const texts = await Promise.all(promises);
+            // Set a timeout of 5 seconds
+            const CMP_TIMEOUT = 5000;
+            const AUTO_CONSENT_TIMEOUT_MSG = 'autoConsentTimeout';
+            const timeout = new Promise((resolve) => setTimeout(
+                resolve, CMP_TIMEOUT, AUTO_CONSENT_TIMEOUT_MSG
+            ));
+
+            // wait either for all promises to resolve or for the timeout
+            Promise.race([
+                Promise.all(promises),
+                timeout,
+            ])
+            .then((texts) => {
+                if (texts === AUTO_CONSENT_TIMEOUT_MSG) {
+                    this.log(`CMP Collector: Timeout`);
+                } else {
+                    const allTexts = texts.join('\n');
+                    for (const p of DETECT_PATTERNS) {
+                        const matches = allTexts.match(p);
+                        if (matches) {
+                            foundPatterns.push(p.toString());
+                            foundSnippets.push(...matches.map(m => m.substring(0, 200)));
+                        }
+                    }
                 }
-            }
+            })
+            .catch((error) => {
+                this.log(`CMP Collector: ERROR ${error}`);
+            });
+
         }
         this.pendingScan.resolve();
+        this.log(`CMP Collector: Found ${foundPatterns.length} patterns and ${foundSnippets.length} snippets`);
         this.scanResult = {
             patterns: foundPatterns,
             snippets: Array.from(new Set(foundSnippets)),

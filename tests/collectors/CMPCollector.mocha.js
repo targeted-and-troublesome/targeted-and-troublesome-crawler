@@ -88,7 +88,6 @@ describe('CMPCollector', () => {
                         autoAction: null,
                         disabledCmps: [],
                         enablePrehide: false,
-                        enableCosmeticRules: true,
                         detectRetries: 20,
                     })} })`,
                     contextId: 1111,
@@ -188,7 +187,6 @@ describe('CMPCollector', () => {
                     type: 'autoconsentDone',
                     cmp: 'some cmp',
                     url: 'some url',
-                    isCosmetic: false,
                 };
                 collector.selfTestFrame = null;
                 commands.splice(0, commands.length);
@@ -204,7 +202,6 @@ describe('CMPCollector', () => {
                     type: 'autoconsentDone',
                     cmp: 'some cmp',
                     url: 'some url',
-                    isCosmetic: false,
                 };
                 collector.selfTestFrame = 1337;
                 commands.splice(0, commands.length);
