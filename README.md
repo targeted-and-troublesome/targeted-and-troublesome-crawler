@@ -1,11 +1,12 @@
 ## Targeted and Troublesome: Tracking and Advertising on Children's Websites (S&P'24)
 
-This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/abs/2308.04887) (to be presented at [IEEE S&P'24](https://sp2024.ieee-security.org/)).
+This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/abs/2308.04887) (to be presented at [IEEE S&P'24](https://sp2024.ieee-security.org/)). The paper investigates the prevalence of tracking and advertising on websites targeted at children.
 
-**Background:** Trackers and advertisers frequently exploit users' online behavior without consent, including on websites targeting children. However, research in this area remains limited. To address this gap, we conduct an examination of tracking and advertising practices on such websites. Leveraging a multilingual classifier we developed and a dataset comprising over two million web pages, we identify two thousand child-directed websites and assess the prevalence of trackers, fingerprinting scripts, and advertisements. Our findings indicate that roughly 90% of these websites employ tracking mechanisms, and about 27% display targeted advertisements, underscoring the need for parental consent. Additionally, we employ a machine learning pipeline to uncover inappropriate ads promoting dating, weight loss, mental health services, and explicit content, highlighting the necessity for more stringent regulatory measures to protect children online.
+### Background
+Trackers and advertisers frequently exploit users' online behavior without consent, including on websites targeting children. However, research in this area remains limited. To address this gap, we conduct an examination of tracking and advertising practices on such websites. Leveraging a multilingual classifier we developed and a dataset comprising over two million web pages, we identified two thousand child-directed websites and assessed the prevalence of trackers, fingerprinting scripts, and advertisements. Our findings indicate that roughly 90% of these websites employ tracking mechanisms, and about 27% display targeted advertisements, underscoring the need for parental consent. Additionally, we employ a machine learning pipeline to uncover inappropriate ads promoting dating, weight loss, mental health services, and explicit content, highlighting the necessity for more stringent regulatory measures to protect children online.
 
 ### Crawler
-We extended DuckDuckGo’s [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) to record HTTP requests/responses, cookies,
+We extended [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) from DuckDuckGo. Our enhancements capture HTTP requests/responses, cookies,
 screenshots, and JavaScript API calls. Our main modifications can be found in the following files:
 - [`AdCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/AdCollector.js): detects ads and scrapes ad
 disclosures. During the development of AdCollector, we benefited from the [adscraper](https://github.com/UWCSESecurityLab/adscraper) tool.
@@ -14,13 +15,16 @@ disclosures. During the development of AdCollector, we benefited from the [adscr
 - [`LinkCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/LinkCollector.js): extracts inner page links.
 - [`VideoCollector.js`](https://github.com/asumansenol/targeted-and-troublesome-crawler/blob/main/collectors/VideoCollector.js): captures the crawl video.
 
-To start a crawl, 1) clone this repo, 2) install the required npm packages (`npm i`) and 3) run the following command for a given URL or a URL list:
+### Getting Started 
+1. clone this repo.
+2. install the required npm packages (`npm i`).
+3. run the following command for a given URL or a URL list:
 
-- for a given URL: 
+**For a single URL:** 
 
 ```npm run crawl -- -u 'https://games2jolly.com/' -o ./data/ -v -f -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"```
 
-- for a URL list: 
+**For a list of URLs:** 
 
 ```npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv -o ./data/ -v -f -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"```
 
@@ -29,7 +33,8 @@ All URLs, including both landing and inner pages, associated with the child-dire
 
 Please check the upstream [Tracker Radar Collector repository](https://github.com/duckduckgo/tracker-radar-collector/) for other command line options.
 
-We found ads linking to malicious content, and improper ads of sex toys, dating services, and ads containing sexually suggestive images as follows. For further information, please refer to our paper for a comprehensive overview.
+We found ads that promote services related to dating, weight loss, and mental health; as well as ads for sex toys and flirting chat services. Some of these ads feature repulsive, sexually explicit and highly
+inappropriate imagery. Please refer to our paper for a comprehensive overview.
 <p align="center">
     <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/48864422/281004761-45e7659b-fef0-49aa-adf1-d776cb7dca62.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231107%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231107T102230Z&X-Amz-Expires=300&X-Amz-Signature=962089726876944688519766e179ad1b9e4a0f44592b113f9104d14117d06d3c&X-Amz-SignedHeaders=host&actor_id=48864422&key_id=0&repo_id=715520577" alt="Material Bread logo">
 </p>
