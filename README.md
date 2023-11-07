@@ -1,4 +1,4 @@
-## Targeted and Troublesome: Tracking and Advertising on Children's Websites (S&P'24)
+## Targeted and Troublesome: Tracking and Advertising on Children's Websites (IEEE S&P'24)
 
 This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/abs/2308.04887) (to be presented at [IEEE S&P'24](https://sp2024.ieee-security.org/)). The paper investigates the prevalence of tracking and advertising on websites targeted at children.
 
