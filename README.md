@@ -42,11 +42,18 @@ inappropriate imagery. Please refer to our paper for a comprehensive overview.
 
 ### Reference
 ```
-@article{
-    author    = {Z. Moti, A. Senol, H. Bostani, F. Borgesius, V. Moonsamy, A. Mathur, and G. Acar},
-    title     = {{Targeted and Troublesome: Tracking and Advertising on Children's Websites}},
-    booktitle = {IEEE Security and Privacy},
-    year      = 2024,
-    month     = May
+@INPROCEEDINGS {,
+author = {Z. Moti and A. Senol and H. Bostani and F. Zuiderveen Borgesius and V. Moonsamy and A. Mathur and G. Acar},
+booktitle = {2024 IEEE Symposium on Security and Privacy (SP)},
+title = {Targeted and Troublesome: Tracking and Advertising on Children’s Websites},
+year = {2024},
+volume = {},
+issn = {2375-1207},
+pages = {118-118},
+doi = {10.1109/SP54263.2024.00118},
+url = {https://doi.ieeecomputersociety.org/10.1109/SP54263.2024.00118},
+publisher = {IEEE Computer Society},
+address = {Los Alamitos, CA, USA},
+month = {may}
 }
 ```
