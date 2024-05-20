@@ -8,8 +8,8 @@ This repository contains the code for the paper titled [_Targeted and Troublesom
   <summary>
       Click to see a collage of ads found in our study. ⚠️ <b>NSFW</b> ⚠️
   </summary>
-  
-![bad_ads_collage](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/5788790/a9183d6d-2fe3-4571-8326-5ee22037ea51)  
+
+![bad_ads_collage](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/5788790/a9183d6d-2fe3-4571-8326-5ee22037ea51)
 
 </details>
 
