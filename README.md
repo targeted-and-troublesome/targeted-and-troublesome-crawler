@@ -59,9 +59,6 @@ repo for explanations of the command line options.
 The shell script we used to start the crawls can be found in the
 [`shell_scripts/ad-scraper folder`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/shell_scripts/ad-scraper).
 
-All crawled URLs, including landing and inner page URLs, associated with the child-directed sites,
-are available within [`this folder`]().
-
 You can find all crawled URLs, including landing and inner page URLs associated with the child-directed sites,
 in the [`URLs directory`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/urls).
 
