@@ -17,3 +17,8 @@ The model was fine-tuned on Ubuntu 22.04 LTS with Python 3.10.12 but can run on 
 - `sklearn`
 - `numpy`
 - `sentence-transformers`
+
+
+## Disclaimer
+⚠️ We strongly recommend against using this model in high-stakes decision-making and classification.
+Consult the [§6.3 Limitations](https://arxiv.org/pdf/2308.04887#page=13) for potential biases and shortcomings.
