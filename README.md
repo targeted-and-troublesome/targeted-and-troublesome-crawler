@@ -29,13 +29,22 @@ disclosures. AdCollector's ad detection and scraping code is partly based on [ad
 - [`VideoCollector.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/collectors/VideoCollector.js): captures the crawl video.
 
 #### Crawler - Getting Started
-1. Clone this repo.
-2. Install the required npm packages (`npm i`).
-3. Run one of the following commands for a single or multiple URL crawl:
+### Installation
+1. Clone this repo:
+    ```sh
+    git clone https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler.git
+    cd targeted-and-troublesome-crawler
+    ```
+2. Install the required npm packages:
+    ```sh
+    npm install
+    ```
+
+### Running the Crawler
 
 For a single URL:
 
-```
+```sh
   npm run crawl -- -u 'https://games2jolly.com'
       -o ./data/ -v -f
       -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
@@ -47,7 +56,7 @@ For a single URL:
 
 For a list of URLs:
 
-```
+```sh
   npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv
       -o ./data/ -v -f
       -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
@@ -68,22 +77,9 @@ in the [`URLs directory`](https://github.com/targeted-and-troublesome/targeted-a
 
 ### Webpage classifier
 
-ℹ️ _Refer to the [`inference.ipynb`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/classifier/inference.ipynb)
-notebook to directly download and use the fine-tuned model._
-
-We built a lightweight multilingual classifier to identify websites directed at children based on their title and description. Specifically, we fine-tuned the distilled, multilingual `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` model from the [`SentenceTransformer`](https://sbert.net/) library using a combination of existing list of children's websites and manually labeled training data. The code for fine-tuning and inference (webpage classification) can be found in the [`classifier`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/tree/main/classifier) directory.
-
-A high-level overview of the classification pipeline is shown below.
-We use the classifier's confidence scores to efficiently prioritize websites for manual review,
-rather than relying on binary classification.
-For more details, please refer to [§3. Building a list of child-directed websites](https://arxiv.org/pdf/2308.04887#page=4) in the paper.
-
-**Disclaimer:**
-⚠️ We strongly recommend against using this model in high-stakes decision-making and classification.
-Consult the [§6.3 Limitations](https://arxiv.org/pdf/2308.04887#page=13) for potential biases and shortcomings.
-
-![Screenshot 2024-05-20 at 14 22 16](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/44579458/aafff9f0-51ae-44d4-b4b3-cceb13e97347)
-
+Refer to the [`inference.ipynb`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/classifier/inference.ipynb)
+notebook for downloading and using the fine-tuned model that detects child-directed webpages by
+page titles and descriptions. More details about the classification pipeline can be found in the [`classifier`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/tree/main/classifier) directory.
 
 
 ### Reference
