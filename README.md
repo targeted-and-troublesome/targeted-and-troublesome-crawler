@@ -35,25 +35,35 @@ disclosures. AdCollector is partly based on the [adscraper](https://github.com/U
 
 **For a single URL:**
 
-```npm run crawl -- -u 'https://games2jolly.com/' -o ./data/ -v -f \
-      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" \
-      --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"```
+```
+  npm run crawl -- -u 'https://games2jolly.com/'
+      -o ./data/ -v -f
+      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
+      --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"
+```
 
 
 **For a list of URLs:**
 
-```npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv -o ./data/ -v -f \
-      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" --reporters \
-      'cli,file' -l ./data/ --autoconsent-action "optIn"```
+```
+  npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv
+      -o ./data/ -v -f
+      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
+      --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"
+```
 
 Please check the upstream [Tracker Radar Collector repository](https://github.com/duckduckgo/tracker-radar-collector/)
-for the meaning of command line options.
+repo for explanations of the command line options.
 
-#### Crawl scripts
+#### Crawl scripts and website lists
+The shell script we used to start the crawls can be found in the
+[`shell_scripts/ad-scraper folder`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/shell_scripts/ad-scraper).
 
-The [`shell_scripts/ad-scraper folder`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/shell_scripts/ad-scraper) contains the scripts used to crawl the child-directed sites as part of this study.
-All URLs, including both landing and inner pages, associated with the child-directed sites, are available within [`this folder`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/urls).
+All crawled URLs, including landing and inner page URLs, associated with the child-directed sites,
+are available within [`this folder`]().
 
+You can find all crawled URLs, including landing and inner page URLs associated with the child-directed sites,
+in the [`URLs directory`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/urls).
 
 ### Webpage Classifier
 We built a lightweight multilingual classifier to identify websites directed at children based on their title and description. Specifically, we fine-tuned the distilled, multilingual `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` model from the [`SentenceTransformer`](https://sbert.net/) library using a combination of existing list of children's websites and manually labeled training data. The code for fine-tuning and inference (webpage classification) can be found in the [`classifier`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/tree/main/classifier) directory.
