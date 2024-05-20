@@ -1,6 +1,6 @@
 torch
 transformers
 datasets
-sklearn
+scikit-learn
 numpy
 sentence-transformers
