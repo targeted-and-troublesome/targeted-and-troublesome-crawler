@@ -23,8 +23,8 @@ We extended [Tracker Radar Collector](https://github.com/duckduckgo/tracker-rada
 
 Our main modifications can be found in the following files:
 - [`AdCollector.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/collectors/AdCollector.js): detects ads and scrapes ad
-disclosures. AdCollector is partly based on the [adscraper](https://github.com/UWCSESecurityLab/adscraper) library of the [UW CSE Security Lab](https://seclab.cs.washington.edu/).
-- [`FingerprintCollector.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/collectors/FingerprintCollector.js) and [`fingerprintDetection.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/helpers/fingerprintDetection.js): detects fingerprinting related function calls and property accesses.
+disclosures. AdCollector's ad detection and scraping code is partly based on [adscraper](https://github.com/UWCSESecurityLab/adscraper) ([UW CSE Security Lab](https://seclab.cs.washington.edu/)).
+- [`FingerprintCollector.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/collectors/FingerprintCollector.js) and [`fingerprintDetection.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/helpers/fingerprintDetection.js): detect fingerprinting related function calls and property accesses.
 - [`LinkCollector.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/collectors/LinkCollector.js): extracts inner page links.
 - [`VideoCollector.js`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/collectors/VideoCollector.js): captures the crawl video.
 
@@ -33,36 +33,40 @@ disclosures. AdCollector is partly based on the [adscraper](https://github.com/U
 2. Install the required npm packages (`npm i`).
 3. Run one of the following commands for a single or multiple URL crawl:
 
-**For a single URL:**
+For a single URL:
 
 ```
-  npm run crawl -- -u 'https://games2jolly.com/'
+  npm run crawl -- -u 'https://games2jolly.com'
       -o ./data/ -v -f
       -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
-      --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"
+      --reporters 'cli,file'
+      -l ./data/
+      -autoconsent-action "optIn"
 ```
 
 
-**For a list of URLs:**
+For a list of URLs:
 
 ```
   npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv
       -o ./data/ -v -f
       -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
-      --reporters 'cli,file' -l ./data/ --autoconsent-action "optIn"
+      --reporters 'cli,file'
+      -l ./data/
+      --autoconsent-action "optIn"
 ```
 
 Please check the upstream [Tracker Radar Collector repository](https://github.com/duckduckgo/tracker-radar-collector/)
 repo for explanations of the command line options.
 
-#### Crawl scripts and website lists
+#### Crawl scripts and webpage lists
 The shell script we used to start the crawls can be found in the
 [`shell_scripts/ad-scraper folder`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/shell_scripts/ad-scraper).
 
 You can find all crawled URLs, including landing and inner page URLs associated with the child-directed sites,
 in the [`URLs directory`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/blob/main/urls).
 
-### Webpage Classifier
+### Webpage classifier
 We built a lightweight multilingual classifier to identify websites directed at children based on their title and description. Specifically, we fine-tuned the distilled, multilingual `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` model from the [`SentenceTransformer`](https://sbert.net/) library using a combination of existing list of children's websites and manually labeled training data. The code for fine-tuning and inference (webpage classification) can be found in the [`classifier`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/tree/main/classifier) directory.
 
 A high-level overview of the classification pipeline is shown below.
@@ -72,9 +76,7 @@ For more details, please refer to [§3. Building a list of child-directed websit
 
 **Disclaimer:**
 ⚠️ We strongly recommend against using this model in high-stakes decision-making and classification.
-
-The model may be vulnerable to adversarial manipulation and may be biased towards English websites.
-Consult the [§6.3 Limitations](https://arxiv.org/pdf/2308.04887#page=13) for other shortcomings and risks.
+Consult the [§6.3 Limitations](https://arxiv.org/pdf/2308.04887#page=13) for potential biases and shortcomings.
 
 ![Screenshot 2024-05-20 at 14 22 16](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/44579458/aafff9f0-51ae-44d4-b4b3-cceb13e97347)
 
@@ -97,3 +99,6 @@ Consult the [§6.3 Limitations](https://arxiv.org/pdf/2308.04887#page=13) for ot
     month = {may}
 }
 ```
+
+### Contact
+TBD
