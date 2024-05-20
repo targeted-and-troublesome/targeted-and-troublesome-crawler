@@ -1,12 +1,13 @@
 ## Targeted and Troublesome: Tracking and Advertising on Children's Websites (IEEE S&P'24)
 
-This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/pdf/2308.04887) (to be presented at [2024 IEEE Security & Privacy Conference](https://sp2024.ieee-security.org/)). The paper investigates targeted and inappropriate advertising on websites targeted at children, along with online tracking.
+This repository contains the code for the paper titled [**Targeted and Troublesome: Tracking and Advertising on Children's Websites**](https://arxiv.org/pdf/2308.04887) (to be presented at the [45th IEEE Symposium on
+Security and Privacy](https://sp2024.ieee-security.org/)). The paper investigates targeted and inappropriate advertising on websites targeted at children, along with online tracking.
 
 ![ad_classification](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/5788790/74805ebd-a8c0-4bdb-b2f3-d89825574edb)
 
 <details>
   <summary>
-      Click to see a collage of ads found in our study. ⚠️ <b>NSFW</b> ⚠️
+      <b>NSFW</b> ⚠️ Click to see a sample of improper ads found on child-directed websites in our crawls.
   </summary>
 
 ![bad_ads_collage](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/5788790/a9183d6d-2fe3-4571-8326-5ee22037ea51)
