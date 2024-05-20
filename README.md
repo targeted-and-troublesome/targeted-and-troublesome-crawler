@@ -1,15 +1,6 @@
 ## Targeted and Troublesome: Tracking and Advertising on Children's Websites (IEEE S&P'24)
 
-This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/abs/2308.04887) (to be presented at [IEEE Security & Privacy'24](https://sp2024.ieee-security.org/)). The paper investigates targeted and inappropriate advertising on websites targeted at children, along with online tracking.
-
-### Background
-Trackers and advertisers often exploit online user behavior without consent, a practice that extends even to websites targeted at children. Despite the critical nature of this issue, the research focusing on children's websites remains limited. To bridge this gap, we investigated tracking and advertising practices on child-directed websites. Utilizing a multilingual classifier and analyzing a dataset of over two million web pages, we identified two thousand websites targeted at children.
-
-Our analysis revealed that approximately 90% of these sites use tracking mechanisms, and around 27% display targeted advertisements-a practice that should require verifiable parental consent. Furthermore, we implemented a machine learning pipeline to detect inappropriate advertisements related to dating, weight loss, mental health services, and explicit content. We found ads that promote services related to dating, weight loss, and mental health; as well as ads for sex toys and flirting chat services. Some of these ads feature repulsive, sexually explicit, and highly inappropriate imagery. Please refer to our paper for a comprehensive overview.
-
-
-https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/44579458/5366eed3-4ef3-4770-9fc0-ede6bf05ae74
-
+This repository contains the code for the paper titled [_Targeted and Troublesome: Tracking and Advertising on Children's Websites_](https://arxiv.org/pdf/2308.04887) (to be presented at [2024 IEEE Security & Privacy Conference](https://sp2024.ieee-security.org/)). The paper investigates targeted and inappropriate advertising on websites targeted at children, along with online tracking.
 
 ### Crawler
 We extended [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) from DuckDuckGo to scrape ads, detect fingerprinting attempts and capture a video recording of the screen.
