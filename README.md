@@ -5,6 +5,7 @@ This repository contains the code for the paper titled [_Targeted and Troublesom
 ### Background
 Trackers and advertisers often exploit user behavior online without consent, a practice that extends even to websites targeted at children. Despite the critical nature of this issue, research has been sparse. To bridge this gap, we conducted a thorough investigation into the tracking and advertising practices on child-directed websites. Utilizing a multilingual classifier and analyzing a dataset of over two million web pages, we identified two thousand websites targeted at children. Our analysis revealed that approximately 90% of these sites use tracking mechanisms, and around 27% display targeted advertisements-a practice that should require verifiable parental consent. Furthermore, we implemented a machine learning pipeline to detect inappropriate advertisements related to dating, weight loss, mental health services, and explicit content. We found ads that promote services related to dating, weight loss, and mental health; as well as ads for sex toys and flirting chat services. Some of these ads feature repulsive, sexually explicit, and highly inappropriate imagery. Please refer to our paper for a comprehensive overview.
 
+
 ### Crawler
 We extended [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) from DuckDuckGo. Our enhancements capture HTTP requests/responses, cookies,
 screenshots, and JavaScript API calls. Our main modifications can be found in the following files:
@@ -34,7 +35,15 @@ All URLs, including both landing and inner pages, associated with the child-dire
 Please check the upstream [Tracker Radar Collector repository](https://github.com/duckduckgo/tracker-radar-collector/) for other command line options.
 
 ### Classifier
-TBD
+We built a multilingual classifier to identify websites directed at children based on their title and description. We utilized a pre-trained and multilingual langualge model from [`SentenceTransformer`](https://sbert.net/), fine-tuning it for this task. 
+
+A high-level overview of the classification pipeline is shown below:
+
+![Screenshot 2024-05-20 at 14 22 16](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/44579458/aafff9f0-51ae-44d4-b4b3-cceb13e97347)
+
+For more details, please refer to the Section 3 of the paper.
+
+The code and resources for this classifier can be found in the [`classifier`](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/tree/main/classifier) directory of this repository. 
 
 ### Reference
 ```
