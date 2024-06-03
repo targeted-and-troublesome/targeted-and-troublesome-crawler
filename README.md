@@ -45,23 +45,23 @@ disclosures. AdCollector's ad detection and scraping code is partly based on [ad
 For a single URL:
 
 ```sh
-  npm run crawl -- -u 'https://games2jolly.com'
-      -o ./data/ -v -f
-      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
-      --reporters 'cli,file'
-      -l ./data/
-      -autoconsent-action "optIn"
+  npm run crawl -- -u 'https://games2jolly.com' \
+      -o ./data/ -v -f \
+      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" \
+      --reporters 'cli,file' \
+      -l ./data/ \
+      --autoconsent-action "optIn"
 ```
 
 
 For a list of URLs:
 
 ```sh
-  npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv
-      -o ./data/ -v -f
-      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos"
-      --reporters 'cli,file'
-      -l ./data/
+  npm run crawl -- -u urls/fra_desktop_home_inner_combined.csv \
+      -o ./data/ -v -f \
+      -d "fingerprints,requests,cookies,ads,screenshots,cmps,videos" \
+      --reporters 'cli,file' \
+      -l ./data/ \
       --autoconsent-action "optIn"
 ```
 
