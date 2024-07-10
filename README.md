@@ -101,4 +101,18 @@ page titles and descriptions. More details about the classification pipeline can
 ```
 
 ### Contact
-TBD
+
+For any questions, suggestions, or issues regarding this project or our paper, please contact:
+
+| **Author**         | **Email**                     |
+|--------------------|-------------------------------|
+| [Zahra Moti](https://www.ru.nl/en/people/moti-jeshveghani-z)      | zahra.moti@ru.nl   |
+| [Asuman Senol](https://www.asumansenol.com/)    | asuman.senol@esat.kuleuven.be   |
+| [Gunes Acar](https://gunesacar.net/)     | g.acar@cs.ru.nl   |
+| [Hamid Bostani](https://www.ru.nl/en/people/bostani-h) | hamid.bostani@ru.nl |
+| [Frederik Zuiderveen Borgesius](https://www.ru.nl/personen/zuiderveen-borgesius-f) | frederikzb@cs.ru.nl|
+| [Veelasha Moonsamy](https://veelasha.org/) | veelasha.moonsamy@ruhr-uni-bochum.de |
+| [Arunesh Mathur](https://aruneshmathur.co.in/) | aruneshmathur1990@gmail.com |
+
+
+You can also reach out to us by opening an issue on [our GitHub repository](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/issues).
