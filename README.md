@@ -1,6 +1,6 @@
 ## Targeted and Troublesome: Tracking and Advertising on Children's Websites (IEEE S&P'24)
 
-This repository contains the code for the paper titled [**Targeted and Troublesome: Tracking and Advertising on Children's Websites**](https://arxiv.org/pdf/2308.04887) (to be presented at the [45th IEEE Symposium on
+This repository contains the code for the paper titled [**Targeted and Troublesome: Tracking and Advertising on Children's Websites**](https://arxiv.org/pdf/2308.04887) (published at the [45th IEEE Symposium on
 Security and Privacy](https://sp2024.ieee-security.org/)). The paper investigates targeted and inappropriate advertising on websites targeted at children, along with online tracking.
 
 ![ad_classification](https://github.com/targeted-and-troublesome/targeted-and-troublesome-crawler/assets/5788790/74805ebd-a8c0-4bdb-b2f3-d89825574edb)
@@ -15,8 +15,8 @@ Security and Privacy](https://sp2024.ieee-security.org/)). The paper investigate
 </details>
 
 
-### Data release (TBD)
-We are working on preparing and documenting the dataset for release.
+### Data release
+The data from seven web crawls conducted in April 2023 is available for download from this [link](https://data.ru.nl/collections/ru/icis/sp24-child-ads_dsc_554).
 
 ### Crawler
 We extended [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector) from DuckDuckGo to scrape ads, detect fingerprinting attempts and capture a video recording of the screen.
